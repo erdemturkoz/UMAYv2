@@ -1,0 +1,35 @@
+# Tests
+## Test 1 - New candidate modal opens and creates a candidate [sanity]
+Viewport: desktop
+Description: Verifies every role can open the single-screen New Candidate modal and save the required first-meeting data.
+Steps:
+1. Open the app and click Adaylar
+2. Click Yeni Aday Ekle
+3. Fill Ad, Soyad, Telefon, Program, Seviye, Kur Sayısı / Kampanya and Kaynak
+4. Click Yeni Adayı Kaydet
+Expected: The candidate is added to the table and the candidate detail drawer opens.
+## Test 2 - Candidate creation keeps registration date empty
+Viewport: desktop
+Description: Verifies candidate creation records only the technical creation event and does not create a student registration date.
+Steps:
+1. Open Adaylar and create a unique candidate
+2. Open the Timeline tab in the automatically opened drawer
+3. Inspect the first timeline event
+Expected: Timeline shows Aday oluşturuldu with branch, creator and technical time; no Kayıt Tarihi is created.
+## Test 3 - Required fields and duplicate phone are guarded
+Viewport: desktop
+Description: Verifies incomplete forms and duplicate phone numbers cannot create a new candidate.
+Steps:
+1. Open Yeni Aday Ekle and submit without required fields
+2. Confirm the validation message
+3. Enter a phone number already visible in the candidate table and submit
+Expected: The candidate is not created and a clear warning is shown.
+## Test 4 - Central pricing data survives refresh
+Viewport: desktop
+Description: Verifies one unique hourly campaign is stored centrally, survives refresh and can be exported.
+Steps:
+1. Create a unique Saat Bazlı education type and campaign with list rate 3000, cash rate 1500 and 20 default hours
+2. Verify İndirim shows %50, save the campaign and refresh the page
+3. Reopen the campaign, verify the saved rates and click Verileri Dışa Aktar
+Expected: The campaign survives refresh from central storage with %50 discount and Verileri Dışa Aktar downloads a portable JSON backup.
+
