@@ -4,3 +4,6 @@
 
 *{box-sizing:border-box}body{margin:0;font-family:'Avenir Next','Segoe UI',sans-serif;-webkit-font-smoothing:antialiased}button{font:inherit}::selection{background:#fff200;color:#000}
 
+@layer components{.input{@apply mt-1 w-full rounded-xl border bg-white p-3 text-[11px] outline-none transition focus:border-black focus:ring-2 focus:ring-black/5}}
+.umay-filter label{color:white}.umay-filter label>span,.umay-filter label>small{color:rgba(255,255,255,.48)!important}.umay-filter input,.umay-filter select{height:40px;border-color:rgba(255,255,255,.12)!important;background:rgba(255,255,255,.07)!important;color:white!important;outline:none}.umay-filter input::placeholder{color:rgba(255,255,255,.35)}.umay-filter select option{color:#111;background:#fff}.umay-filter>div>label:nth-of-type(n+6){display:none}.umay-filter.is-expanded>div>label{display:block}.umay-filter input:focus,.umay-filter select:focus{border-color:#fff200!important;box-shadow:0 0 0 3px rgba(255,242,0,.1)}
+

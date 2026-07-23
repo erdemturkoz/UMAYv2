@@ -1,35 +1,94 @@
 # Tests
-## Test 1 - New candidate modal opens and creates a candidate [sanity]
+## Test 1 - Authentication lock protects CRM access [sanity]
 Viewport: desktop
-Description: Verifies every role can open the single-screen New Candidate modal and save the required first-meeting data.
+Description: Verifies signed-out and synthetic non-member users cannot access or modify the CRM while local recovery remains available; provisioned-member RBAC is verified manually with the real account.
 Steps:
-1. Open the app and click Adaylar
-2. Click Yeni Aday Ekle
-3. Fill Ad, Soyad, Telefon, Program, Seviye, Kur Sayısı / Kampanya and Kaynak
-4. Click Yeni Adayı Kaydet
-Expected: The candidate is added to the table and the candidate detail drawer opens.
-## Test 2 - Candidate creation keeps registration date empty
+1. Open the app signed out and confirm only the secure login screen is shown
+2. Click Google ile Giriş using the available synthetic test account
+3. Confirm a non-provisioned account receives the active-authorization warning and cannot enter the CRM
+4. Confirm local recovery remains available and the synthetic account cannot bypass the membership gate
+Expected: Signed-out and synthetic non-member identities remain blocked without a blank-screen crash; an authorized real member proceeds to the CRM, where Hedef Planlama opens confirmed-registration details including candidate/offer source, shows visually consistent branch/date/advisor/education filters that combine correctly, separates collection metrics, warns about missing paid-course data, and prevents advisor allocations from exceeding the branch course target.
+## Test 2 - Card and note installments require explicit selection
 Viewport: desktop
-Description: Verifies candidate creation records only the technical creation event and does not create a student registration date.
+Description: Verifies card and note plans require an explicit installment choice and preserve it in the offer.
 Steps:
-1. Open Adaylar and create a unique candidate
-2. Open the Timeline tab in the automatically opened drawer
-3. Inspect the first timeline event
-Expected: Timeline shows Aday oluşturuldu with branch, creator and technical time; no Kayıt Tarihi is created.
-## Test 3 - Required fields and duplicate phone are guarded
+1. Sign in as the provisioned founder, open Kampanyalar ve Fiyatlar and confirm the recovered QNB Finansbank · Card Finans tariff appears in the active central list
+2. Create an offer for an İzmit candidate, select Kredi Kartı and an active tariff; confirm saving is blocked until a Taksit Sayısı is selected
+3. Select a non-maximum card installment, add a Senet alternative with its own plan and installment count, save, refresh, then click Aç and Revize
+Expected: No maximum installment is auto-selected; main and alternative choices calculate independently, persist after refresh, and are restored in Revize without overwriting the source.
+## Test 3 - Guest offer and alternatives
 Viewport: desktop
-Description: Verifies incomplete forms and duplicate phone numbers cannot create a new candidate.
+Description: Verifies a signed-in member can prepare a proposal for an unregistered name with at most two alternatives.
 Steps:
-1. Open Yeni Aday Ekle and submit without required fields
-2. Confirm the validation message
-3. Enter a phone number already visible in the candidate table and submit
-Expected: The candidate is not created and a clear warning is shown.
-## Test 4 - Central pricing data survives refresh
+1. Open Yeni Teklif, type a unique name and valid unique phone, select a source without selecting a registered candidate, then choose education and a campaign
+2. Confirm one main offer is shown, add two alternatives and save the offer
+3. Confirm the row is marked Misafir with two alternatives and that Adaya Dönüştür is available to a verified member
+Expected: The guest offer appears with phone, source and Misafir record type; no fourth card can be added; verified-member candidate conversion remains available for manual RBAC validation.
+
+## Test 4 - Offer copy, revision chain and lifecycle
 Viewport: desktop
-Description: Verifies one unique hourly campaign is stored centrally, survives refresh and can be exported.
+Description: Verifies grouped main/alternative visibility, lifecycle actions, protected deletion, and coordinated candidate-offer registration persistence.
+Steps:
+1. Open a saved offer and click Kopyala; save it
+2. Confirm the copy editor opens as an independent offer without a parent revision reference; save persistence is verified manually with an authorized member
+3. Revise the original, save the revision, and confirm the original remains unchanged
+4. Share the revision, open the candidate's Teklifler tab, and inspect the grouped main and alternative choices plus version history
+5. Try deleting an offer that has a newer revision, then delete the newest revision and confirm the destructive action
+Expected: One offer group shows every alternative separately; latest valid offers expose Kesin Kayda Dönüştür; completed records expose Kayıt Detayı; candidate and offer update together after refresh, stale concurrent registration attempts are rejected and refreshed, and protected deletion rules remain intact.
+
+## Test 5 - Offer Center filters are isolated
+Viewport: desktop
+Description: Verifies offer filters do not change candidate-page filters.
+Steps:
+1. In Adaylar choose a status and date filter
+2. In Teklif Merkezi filter by source, record type, phone and Tüm Tarihler
+3. Reset only the Offer Center filters, then return to Adaylar
+Expected: Phone formats +90, 0-prefixed and digits-only find the same record; source uses sourceId/source data; the five compact KPI cards use only latest offer versions, react to active filters, filter the list and expose clear info popovers; Offer Center shows İndirim Türü instead of Teklif No while offer-number search remains available; the shared dark filter bar keeps primary filters visible, expands secondary filters and resets without changing candidate filters.
+
+## Test 6 - Duplicate phone protection and candidate editing
+Viewport: desktop
+Description: Verifies duplicate candidates are blocked and a newly created candidate remains visible under the active date filter.
+Steps:
+1. Note an existing candidate phone, owner and first offer date
+2. Try the same phone with spaces, +90 and digits-only formats in New Candidate, New Offer and Adaya Dönüştür
+3. Confirm each action is blocked and the warning identifies the candidate, consultant and prior date
+4. Open that candidate, edit a non-key field and save; then create a unique candidate and keep the Bu Ay filter active
+Expected: No duplicate is created; edits preserve linked dates; the unique new candidate appears immediately in Bu Ay and remains visible after refresh.
+## Test 7 - Central pricing data survives refresh
+Viewport: desktop
+Description: Verifies pricing data remains stable after edits and refreshes across browser sessions.
 Steps:
 1. Create a unique Saat Bazlı education type and campaign with list rate 3000, cash rate 1500 and 20 default hours
 2. Verify İndirim shows %50, save the campaign and refresh the page
-3. Reopen the campaign, verify the saved rates and click Verileri Dışa Aktar
-Expected: The campaign survives refresh from central storage with %50 discount and Verileri Dışa Aktar downloads a portable JSON backup.
+3. Reopen and save the campaign, add an inactive card tariff, confirm Arşiv opens automatically, then return to the app from another browser session
+Expected: Unit rates remain 3000 and 1500, discount remains %50, totals do not multiply, inactive tariffs appear in Arşiv, and a second authenticated device sees the same central pricing data after returning to the tab.
 
+## Test 8 - Archive and restore preserve identity and history
+Viewport: desktop
+Description: Verifies authorized archive actions are recoverable and do not physically delete linked CRM history.
+Steps:
+1. Sign in as founder, create a uniquely named candidate and save one offer for that candidate
+2. Archive the offer and candidate, then confirm neither appears in active lists, KPIs or reports
+3. Open Arşiv, restore both records and return to the candidate detail
+4. Confirm the original candidate ID, offer, notes, tasks, shares and revision history are still linked
+Expected: Archive behaves like removal from active work without physical deletion; restore returns the same records and relationships, and duplicate phone protection remains active while archived.
+
+## Test 9 - Branch and role boundaries remain isolated
+Viewport: desktop
+Description: Verifies founder, manager and advisor permissions do not expose or overwrite records outside their scope.
+Steps:
+1. Sign in with an İzmit manager account and confirm only İzmit archive and branch records are visible
+2. Sign in with an İzmit advisor account and confirm only assigned records are visible and Arşiv management is unavailable
+3. Attempt to modify a Körfez record or protected user-management collection from either scoped account
+4. Sign in as founder and confirm both branches plus Kullanıcı Yönetimi remain available
+Expected: Managers stay inside their branch, advisors stay inside their assigned records, unauthorized writes are rejected, and out-of-scope records remain unchanged.
+
+## Test 10 - Reports, targets and calculations remain unchanged
+Viewport: mobile
+Description: Verifies v90 infrastructure protections do not alter approved report filters, target cards, buttons or offer math.
+Steps:
+1. Open Dashboard, Adaylar, Teklif Merkezi and Hedef Planlama at mobile viewport and inspect the approved controls
+2. Apply branch, date, advisor, education and status filters, then compare visible counts and totals with their filtered rows
+3. Create cash, card and note calculations using the same campaign, including a non-maximum installment and two alternatives
+4. Refresh and reopen the offer, reports and target details
+Expected: Approved buttons and layouts remain usable; filters stay isolated; candidate, offer, ciro, tahsilat and target totals use the same records; payment totals, installments, down payment, finance difference and discount authority remain unchanged after refresh.
